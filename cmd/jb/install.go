@@ -16,7 +16,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -36,13 +35,13 @@ func installCommand(dir, jsonnetHome string, uris []string, single bool, legacyN
 		dir = "."
 	}
 
-	jbfilebytes, err := ioutil.ReadFile(filepath.Join(dir, jsonnetfile.File))
+	jbfilebytes, err := os.ReadFile(filepath.Join(dir, jsonnetfile.File))
 	kingpin.FatalIfError(err, "failed to load jsonnetfile")
 
 	jsonnetFile, err := jsonnetfile.Unmarshal(jbfilebytes)
 	kingpin.FatalIfError(err, "")
 
-	jblockfilebytes, err := ioutil.ReadFile(filepath.Join(dir, jsonnetfile.LockFile))
+	jblockfilebytes, err := os.ReadFile(filepath.Join(dir, jsonnetfile.LockFile))
 	if !os.IsNotExist(err) {
 		kingpin.FatalIfError(err, "failed to load lockfile")
 	}
@@ -107,14 +106,14 @@ func depEqual(d1, d2 deps.Dependency) bool {
 	return name && version && source
 }
 
-func writeJSONFile(name string, d interface{}) error {
+func writeJSONFile(name string, d any) error {
 	b, err := json.MarshalIndent(d, "", "  ")
 	if err != nil {
 		return errors.Wrap(err, "encoding json")
 	}
 	b = append(b, []byte("\n")...)
 
-	return ioutil.WriteFile(name, b, 0644)
+	return os.WriteFile(name, b, 0644)
 }
 
 func writeChangedJsonnetFile(originalBytes []byte, modified *v1.JsonnetFile, path string) error {

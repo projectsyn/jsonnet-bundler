@@ -21,7 +21,7 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
+
 	"net/http"
 	"os"
 	"os/exec"
@@ -297,7 +297,7 @@ func (p *GitPackage) Install(ctx context.Context, name, dir, version string) (st
 		}
 
 		glob := []byte(p.Source.Subdir + "/*\n")
-		err = ioutil.WriteFile(filepath.Join(tmpDir, ".git", "info", "sparse-checkout"), glob, 0644)
+		err = os.WriteFile(filepath.Join(tmpDir, ".git", "info", "sparse-checkout"), glob, 0644)
 		if err != nil {
 			return "", err
 		}
